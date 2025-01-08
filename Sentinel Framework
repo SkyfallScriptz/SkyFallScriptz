@@ -1,0 +1,139 @@
+
+
+local Ui = loadstring(game:HttpGet("https://raw.githubusercontent.com/drillygzzly/Roblox-UI-Libs/main/Abyss%20Lib/Abyss%20Lib%20Source.lua"))()
+local Ui = Library
+
+local LoadTime = tick()
+
+local Loader = Library.CreateLoader(
+    "ESP Loader", 
+    Vector2.new(300, 300)
+)
+
+local Window = Library.Window(
+    "ESP Tool", 
+    Vector2.new(500, 620)
+)
+
+Window.SendNotification(
+    "Normal", 
+    "Press RightShift to open and close menu!", 
+    10
+)
+
+Window.Watermark("ESP Active")
+
+-- UI Main
+local Tab1 = Window:Tab("ESP")
+local Section1 = Tab1:Section("ESP Controls", "Left")
+
+local ESP_Toggle = false
+local ESP_Color = Color3.fromRGB(255, 0, 0)
+
+
+local function createESPForPlayer(player)
+    if player ~= game.Players.LocalPlayer then
+        player.CharacterAdded:Connect(function(character)
+            wait(1) -- Ensure character loads
+            if ESP_Toggle and player.TeamColor ~= game.Players.LocalPlayer.TeamColor then
+                local highlight = Instance.new("Highlight")
+                highlight.Parent = character
+                highlight.FillColor = ESP_Color
+                highlight.OutlineColor = Color3.new(0, 0, 0)
+                highlight.OutlineTransparency = 0.5
+                highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            end
+        end)
+    end
+end
+
+local function createESP()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player.Character and player.TeamColor ~= game.Players.LocalPlayer.TeamColor then
+            local highlight = Instance.new("Highlight")
+            highlight.Parent = player.Character
+            highlight.FillColor = ESP_Color
+            highlight.OutlineColor = Color3.new(0, 0, 0)
+            highlight.OutlineTransparency = 0.5
+            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        end
+        createESPForPlayer(player)
+    end
+end
+
+local function removeESP()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player.Character then
+            for _, child in pairs(player.Character:GetChildren()) do
+                if child:IsA("Highlight") then
+                    child:Destroy()
+                end
+            end
+        end
+    end
+end
+
+
+Section1:Toggle({
+    Title = "Enable ESP", 
+    Flag = "ESP_Toggle",
+    Type = "Dangerous",
+    Callback = function(v)
+        ESP_Toggle = v
+        if ESP_Toggle then
+            createESP()
+        else
+            removeESP()
+        end
+    end
+})
+
+
+Section1:Colorpicker({
+    Title = "ESP Color", 
+    Color = ESP_Color, 
+    Flag = "ESP_Color",
+    Callback = function(color)
+        ESP_Color = color
+        if ESP_Toggle then
+            removeESP()
+            createESP()
+        end
+    end
+})
+
+
+game.Players.PlayerAdded:Connect(createESPForPlayer)
+
+game.Players.PlayerRemoving:Connect(function(player)
+    if player.Character then
+        for _, child in pairs(player.Character:GetChildren()) do
+            if child:IsA("Highlight") then
+                child:Destroy()
+            end
+        end
+    end
+end)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if ESP_Toggle then
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player.Character and player.TeamColor ~= game.Players.LocalPlayer.TeamColor then
+                if not player.Character:FindFirstChildOfClass("Highlight") then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Parent = player.Character
+                    highlight.FillColor = ESP_Color
+                    highlight.OutlineColor = Color3.new(0, 0, 0)
+                    highlight.OutlineTransparency = 0.5
+                    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                end
+            end
+        end
+    end
+end)
+
+
+Window:AddSettingsTab()
+Window:SwitchTab(Tab1)
+Window.ToggleAnime(false)
+LoadTime = math.floor((tick() - LoadTime) * 1000)
