@@ -1,40 +1,32 @@
+local UILib = loadstring(game:HttpGet('https://raw.githubusercontent.com/StepBroFurious/Script/main/HydraHubUi.lua'))()
 
 
-local Ui = loadstring(game:HttpGet("https://raw.githubusercontent.com/drillygzzly/Roblox-UI-Libs/main/Abyss%20Lib/Abyss%20Lib%20Source.lua"))()
-local Ui = Library
+local Window = UILib.new("ESP & Aimbot Framework", game.Players.LocalPlayer.UserId, "Developer")
+local Category1 = Window:Category("Main", "http://www.roblox.com/asset/?id=8395621517")
+local SubButton1 = Category1:Button("ESP & Aimbot Tools", "http://www.roblox.com/asset/?id=8395747586")
+local Section1 = SubButton1:Section("Settings", "Left")
 
-local LoadTime = tick()
 
-local Loader = Library.CreateLoader(
-    "ESP Loader", 
-    Vector2.new(300, 300)
-)
-
-local Window = Library.Window(
-    "ESP Tool", 
-    Vector2.new(500, 620)
-)
-
-Window.SendNotification(
-    "Normal", 
-    "Press RightShift to open and close menu!", 
-    10
-)
-
-Window.Watermark("ESP Active")
-
--- UI Main
-local Tab1 = Window:Tab("ESP")
-local Section1 = Tab1:Section("ESP Controls", "Left")
-
+-- ESP Variables
 local ESP_Toggle = false
-local ESP_Color = Color3.fromRGB(255, 0, 0)
+local ESP_Color = Color3.new(1, 0, 0) -- Default red color
+local Aimbot_Toggle = false
+local Aimbot_FOV = 50 -- Field of view for the aimbot
+local TargetPart = "Head" -- The part to aim for
 
 
+-- Sticky Aimbot Variables
+local UserInputService = game:GetService("UserInputService")
+local Camera = game:GetService("Workspace").CurrentCamera
+local LocalPlayer = game.Players.LocalPlayer
+local IsAiming = false
+
+
+-- ESP Functions
 local function createESPForPlayer(player)
     if player ~= game.Players.LocalPlayer then
         player.CharacterAdded:Connect(function(character)
-            wait(1) -- Ensure character loads
+            wait(1) -- Wait for the character to load
             if ESP_Toggle and player.TeamColor ~= game.Players.LocalPlayer.TeamColor then
                 local highlight = Instance.new("Highlight")
                 highlight.Parent = character
@@ -46,6 +38,7 @@ local function createESPForPlayer(player)
         end)
     end
 end
+
 
 local function createESP()
     for _, player in pairs(game.Players:GetPlayers()) do
@@ -61,6 +54,7 @@ local function createESP()
     end
 end
 
+
 local function removeESP()
     for _, player in pairs(game.Players:GetPlayers()) do
         if player.Character then
@@ -74,36 +68,113 @@ local function removeESP()
 end
 
 
+-- Aimbot Functions
+local function getClosestPlayer()
+    local closestPlayer = nil
+    local shortestDistance = Aimbot_FOV
+    
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild(TargetPart) then
+            local target = player.Character[TargetPart]
+            local screenPosition = Camera:WorldToViewportPoint(target.Position)
+            local mouseDistance = (Vector2.new(screenPosition.X, screenPosition.Y) - Vector2.new(UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y)).Magnitude
+            
+            -- Check if the target is within FOV
+            if mouseDistance < shortestDistance then
+                closestPlayer = player
+                shortestDistance = mouseDistance
+            end
+        end
+    end
+    return closestPlayer
+end
+
+
+local function aimAtTarget()
+    local closestPlayer = getClosestPlayer()
+    if closestPlayer then
+        local targetHead = closestPlayer.Character[TargetPart]
+        
+        -- Calculate direction towards target
+        local direction = (targetHead.Position - Camera.CFrame.Position).unit
+        local newCFrame = CFrame.new(Camera.CFrame.Position, targetHead.Position)
+
+
+        -- Adjust the camera to aim at the head of the target
+        Camera.CFrame = newCFrame
+    end
+end
+
+
+-- GUI Elements
+
+
+-- ESP Toggle
 Section1:Toggle({
-    Title = "Enable ESP", 
-    Flag = "ESP_Toggle",
-    Type = "Dangerous",
-    Callback = function(v)
-        ESP_Toggle = v
-        if ESP_Toggle then
-            createESP()
-        else
-            removeESP()
-        end
+    Title = "Enable ESP",
+    Description = "Toggle ESP functionality",
+    Default = false
+}, function(value)
+    ESP_Toggle = value
+    if ESP_Toggle then
+        createESP()
+    else
+        removeESP()
     end
-})
+end)
 
 
-Section1:Colorpicker({
-    Title = "ESP Color", 
-    Color = ESP_Color, 
-    Flag = "ESP_Color",
-    Callback = function(color)
-        ESP_Color = color
-        if ESP_Toggle then
-            removeESP()
-            createESP()
-        end
+-- ESP Color Picker
+Section1:ColorPicker({
+    Title = "ESP Color",
+    Description = "Change the ESP highlight color",
+    Default = ESP_Color
+}, function(value)
+    ESP_Color = value
+    if ESP_Toggle then
+        removeESP()
+        createESP()
     end
-})
+end)
 
 
+-- Aimbot Toggle
+Section1:Toggle({
+    Title = "Enable Aimbot",
+    Description = "Toggle Aimbot functionality",
+    Default = false
+}, function(value)
+    Aimbot_Toggle = value
+end)
+
+
+-- Sticky Aimbot Logic
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.UserInputType == Enum.UserInputType.MouseButton2 then -- Right mouse button
+        IsAiming = true
+    end
+end)
+
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton2 then -- Right mouse button
+        IsAiming = false
+    end
+end)
+
+
+-- Main loop for Sticky Aimbot
+game:GetService("RunService").RenderStepped:Connect(function()
+    if Aimbot_Toggle and IsAiming then
+        aimAtTarget()
+    end
+end)
+
+
+-- Round Updates (for ESP)
 game.Players.PlayerAdded:Connect(createESPForPlayer)
+
 
 game.Players.PlayerRemoving:Connect(function(player)
     if player.Character then
@@ -114,6 +185,7 @@ game.Players.PlayerRemoving:Connect(function(player)
         end
     end
 end)
+
 
 game:GetService("RunService").RenderStepped:Connect(function()
     if ESP_Toggle then
@@ -133,7 +205,24 @@ game:GetService("RunService").RenderStepped:Connect(function()
 end)
 
 
-Window:AddSettingsTab()
-Window:SwitchTab(Tab1)
-Window.ToggleAnime(false)
-LoadTime = math.floor((tick() - LoadTime) * 1000)
+-- GUI Toggle functionality
+local GuiVisible = true
+
+
+-- Create a button in the GUI to toggle visibility
+Section1:Button({
+    Title = "Toggle GUI",
+    Description = "Toggle the visibility of the entire GUI",
+}, function()
+    GuiVisible = not GuiVisible
+    Window.Visible = GuiVisible
+end)
+
+
+-- Optional: Keybind for GUI Toggle (RightShift)
+UserInputService.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.RightShift then
+        GuiVisible = not GuiVisible
+        Window.Visible = GuiVisible
+    end
+end)
