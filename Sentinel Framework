@@ -1,16 +1,17 @@
 --[[
 
-	SKYFALLV1 by Joey © CC0 1.0 Universal (2024)
+	Sentinel V1 by Sentinel © CC0 1.0 Universal (2025)
+	https://github.com/Skyfallscriptz
 
 ]]
 
 --// Loaded Check
 
-if SKYFALLV1Loaded or SKYFALLV1Loading or SKYFALL then
+if SentinelHubV2Loaded or SentinelHubV2Loading or SentinelHub then
 	return
 end
 
-getgenv().SKYFALLV1Loading = true
+getgenv().SentinelV2Loading = true
 
 --// Cache
 
@@ -24,11 +25,11 @@ local osdate = os.date
 
 --// Launching
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Exunys/Roblox-Functions-Library/main/Library.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/SkyfallScriptz/SkyFallScriptz/refs/heads/main/Libary"))()
 
-local GUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Exunys/AirHub-V2/main/src/UI%20Library.lua"))()
-local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/Exunys/Exunys-ESP/main/src/ESP.lua"))()
-local Aimbot = loadstring(game:HttpGet("https://raw.githubusercontent.com/Exunys/Aimbot-V3/main/src/Aimbot.lua"))()
+local GUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SkyfallScriptz/SkyFallScriptz/refs/heads/main/GUI"))()
+local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/SkyfallScriptz/SkyFallScriptz/refs/heads/main/ESP"))()
+local Aimbot = loadstring(game:HttpGet("https://raw.githubusercontent.com/SkyfallScriptz/SkyFallScriptz/refs/heads/main/Aimbot"))()
 
 --// Variables
 
@@ -892,7 +893,7 @@ SettingsSection:Button({
 		GUI:Unload()
 		ESP:Exit()
 		Aimbot:Exit()
-		getgenv().SKYFALLV1Loaded = nil
+		getgenv().SentinelV2Loaded = nil
 	end
 })
 
@@ -931,21 +932,21 @@ ProfilesSection:Button({
 	end
 })
 
-InformationSection:Label("Made by Exunys")
+InformationSection:Label("Made by Sentinel")
 
 InformationSection:Button({
 	Name = "Copy GitHub",
 	Callback = function()
-		setclipboard("https://github.com/Exunys")
+		setclipboard("https://github.com/Notnow")
 	end
 })
 
-InformationSection:Label("AirTeam © 2022 - "..osdate("%Y"))
+InformationSection:Label("SentinelTeam © 2025 - "..osdate("%Y"))
 
 InformationSection:Button({
 	Name = "Copy Discord Invite",
 	Callback = function()
-		setclipboard("https://discord.gg/Ncz3H3quUZ")
+		setclipboard("https://discord.gg/SOON")
 	end
 })
 
@@ -982,8 +983,8 @@ end)
 
 ESP.Load()
 Aimbot.Load()
-getgenv().SKYFALLV1Loaded = true
-getgenv().SKYFALLV1Loading = nil
+getgenv().SentinelV2Loaded = true
+getgenv().SentinelV2Loading = nil
 
 GeneralSignal:Fire()
 GUI:Close()
