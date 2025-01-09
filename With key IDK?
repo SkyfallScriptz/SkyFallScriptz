@@ -26,7 +26,7 @@ checkButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 checkButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 
 -- Define the correct key for validation
-local validKey = "SOLARAK3Y123"
+local validKey = "SENTINEL123"
 
 -- Function to check the key
 checkButton.MouseButton1Click:Connect(function()
