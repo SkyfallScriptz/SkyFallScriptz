@@ -18,6 +18,8 @@ Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
 Frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 Frame.BorderSizePixel = 0
 Frame.Visible = true
+Frame.AnchorPoint = Vector2.new(0.5, 0.5)
+Frame.BackgroundTransparency = 0.2
 
 TextBox.Parent = Frame
 TextBox.Size = UDim2.new(0.8, 0, 0.2, 0)
@@ -27,6 +29,8 @@ TextBox.Text = ""
 TextBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 TextBox.TextColor3 = Color3.new(1, 1, 1)
 TextBox.ClearTextOnFocus = true
+TextBox.Font = Enum.Font.SourceSans
+TextBox.TextSize = 18
 
 SubmitButton.Parent = Frame
 SubmitButton.Size = UDim2.new(0.8, 0, 0.2, 0)
@@ -34,6 +38,8 @@ SubmitButton.Position = UDim2.new(0.1, 0, 0.5, 0)
 SubmitButton.Text = "Submit"
 SubmitButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 SubmitButton.TextColor3 = Color3.new(1, 1, 1)
+SubmitButton.Font = Enum.Font.SourceSans
+SubmitButton.TextSize = 18
 
 StatusLabel.Parent = Frame
 StatusLabel.Size = UDim2.new(0.8, 0, 0.2, 0)
@@ -42,6 +48,7 @@ StatusLabel.Text = ""
 StatusLabel.BackgroundTransparency = 1
 StatusLabel.TextColor3 = Color3.new(1, 1, 1)
 StatusLabel.TextScaled = true
+StatusLabel.Font = Enum.Font.SourceSans
 
 -- Function to handle key submission
 local function checkKey()
@@ -67,6 +74,13 @@ elseif gethui then
     ScreenGui.Parent = gethui()
 else
     ScreenGui.Parent = game.CoreGui
+end
+
+-- Smooth transition effect
+Frame.BackgroundTransparency = 1
+for i = 1, 10 do
+    Frame.BackgroundTransparency = Frame.BackgroundTransparency - 0.1
+    wait(0.05)
 end
 
 -- Connect the button to the function
